@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Balloon Ground Station Tracker</title>
+
+    <!-- All CSS is now inline for offline support -->
+    <style>
+        /* Reset and Base Styles */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        /* Utility Classes (replacing Tailwind) */
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .flex-row {
+            flex-direction: row;
+        }
+
+        .flex-grow {
+            flex-grow: 1;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .p-1 {
+            padding: 0.25rem;
+        }
+
+        .p-2 {
+            padding: 0.5rem;
+        }
+
+        .p-3 {
+            padding: 0.75rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .px-2 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .px-3 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .py-1 {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-3 {
+            margin-top: 0.75rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        .mr-1 {
+            margin-right: 0.25rem;
+        }
+
+        .mr-2 {
+            margin-right: 0.5rem;
+        }
+
+        .pt-4 {
+            padding-top: 1rem;
+        }
+
+        .pb-2 {
+            padding-bottom: 0.5rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .h-full {
+            height: 100%;
+        }
+
+        .h-auto {
+            height: auto;
+        }
+
+        .inline {
+            display: inline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .relative {
+            position: relative;
+        }
+
+        .absolute {
+            position: absolute;
+        }
+
+        .inset-0 {
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .rounded {
+            border-radius: 0.25rem;
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        .rounded-full {
+            border-radius: 9999px;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto;
+        }
+
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .font-mono {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .font-extrabold {
+            font-weight: 800;
+        }
+
+        .text-xs {
+            font-size: 0.75rem;
+            line-height: 1rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+            line-height: 1.75rem;
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+            line-height: 1.75rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+            line-height: 2rem;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .col-span-2 {
+            grid-column: span 2 / span 2;
+        }
+
+        /* Colors */
+        .bg-black {
+            background-color: #000;
+        }
+
+        .bg-gray-700 {
+            background-color: #374151;
+        }
+
+        .bg-gray-800 {
+            background-color: #1f2937;
+        }
+
+        .bg-gray-900 {
+            background-color: #111827;
+        }
+
+        .bg-green-600 {
+            background-color: #059669;
+        }
+
+        .bg-yellow-600 {
+            background-color: #d97706;
+        }
+
+        .bg-red-600 {
+            background-color: #dc2626;
+        }
+
+        .bg-indigo-600 {
+            background-color: #4f46e5;
+        }
+
+        .text-white {
+            color: #fff;
+        }
+
+        .text-gray-100 {
+            color: #f3f4f6;
+        }
+
+        .text-gray-400 {
+            color: #9ca3af;
+        }
+
+        .text-gray-500 {
+            color: #6b7280;
+        }
+
+        .text-blue-200 {
+            color: #bfdbfe;
+        }
+
+        .text-blue-400 {
+            color: #60a5fa;
+        }
+
+        .text-teal-200 {
+            color: #99f6e4;
+        }
+
+        .text-teal-400 {
+            color: #2dd4bf;
+        }
+
+        .text-yellow-200 {
+            color: #fef08a;
+        }
+
+        .text-yellow-400 {
+            color: #facc15;
+        }
+
+        .text-green-200 {
+            color: #bbf7d0;
+        }
+
+        .text-green-400 {
+            color: #4ade80;
+        }
+
+        .text-red-200 {
+            color: #fecaca;
+        }
+
+        .text-red-400 {
+            color: #f87171;
+        }
+
+        .text-indigo-400 {
+            color: #818cf8;
+        }
+
+        .text-indigo-700 {
+            color: #4338ca;
+        }
+
+        .text-purple-400 {
+            color: #c084fc;
+        }
+
+        .border-b {
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+        }
+
+        .border-t {
+            border-top-width: 1px;
+            border-top-style: solid;
+        }
+
+        .border-gray-700 {
+            border-color: #374151;
+        }
+
+        .border-indigo-700 {
+            border-color: #4338ca;
+        }
+
+        .shadow-2xl {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .hover\:bg-gray-700:hover {
+            background-color: #374151;
+        }
+
+        .hover\:bg-indigo-500:hover {
+            background-color: #6366f1;
+        }
+
+        .hover\:text-white:hover {
+            color: #fff;
+        }
+
+        .transition-colors {
+            transition: color 0.15s ease, background-color 0.15s ease;
+        }
+
+        /* Animation for pulse effect */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Map styles */
+        #map {
+            flex-grow: 1;
+            height: 60vh;
+            min-height: 300px;
+            background-color: #333;
+            z-index: 1;
+        }
+
+        /* Responsive layout for main container */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 1024px) {
+            .main-container {
+                flex-direction: row;
+                height: 100vh;
+            }
+
+            #map {
+                height: 100vh;
+                flex-grow: 3;
+            }
+
+            #telemetry-panel {
+                flex-shrink: 0;
+                width: 380px;
+                height: 100vh;
+                overflow-y: auto;
+                z-index: 2;
+            }
+        }
+
+        /* Overlay for connection status */
+        #connection-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: opacity 0.5s;
+            border-radius: 0.5rem;
+            pointer-events: none;
+        }
+
+        #connection-overlay.active {
+            pointer-events: auto;
+        }
+
+        /* Signal bar styling */
+        .signal-bar-container {
+            height: 10px;
+            background-color: #3f3f46;
+            border-radius: 9999px;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .signal-bar {
+            height: 100%;
+            transition: width 0.5s ease-out, background-color 0.5s ease-out;
+        }
+
+        .data-card {
+            background-color: #2b2b45;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #3d3d5c;
+        }
+
+        /* Icon sizing */
+        .icon-sm {
+            width: 12px;
+            height: 12px;
+        }
+
+        .icon-md {
+            width: 20px;
+            height: 20px;
+        }
+
+        .icon-lg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .icon-xl {
+            width: 32px;
+            height: 32px;
+        }
+
+        .icon-2xl {
+            width: 48px;
+            height: 48px;
+        }
+
+        /* Offline map fallback */
+        .offline-map {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #1e3a5f 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .offline-map::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+            animation: oceanWave 15s ease-in-out infinite;
+        }
+
+        @keyframes oceanWave {
+
+            0%,
+            100% {
+                transform: translate(-5%, -5%);
+            }
+
+            50% {
+                transform: translate(5%, 5%);
+            }
+        }
+
+        .balloon-indicator {
+            position: absolute;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.5s ease-out;
+        }
+
+        .balloon-indicator .ping {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.3);
+            animation: pingAnimation 2s ease-out infinite;
+        }
+
+        @keyframes pingAnimation {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .coord-display {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Grid lines for offline map */
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Offline indicator */
+        .offline-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(245, 158, 11, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .online-badge {
+            background: rgba(16, 185, 129, 0.9);
+        }
+
+        /* Leaflet CSS (minimal inline version for offline) */
+        .leaflet-pane,
+        .leaflet-tile,
+        .leaflet-marker-icon,
+        .leaflet-marker-shadow,
+        .leaflet-tile-container,
+        .leaflet-pane>svg,
+        .leaflet-pane>canvas,
+        .leaflet-zoom-box,
+        .leaflet-image-layer,
+        .leaflet-layer {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .leaflet-container {
+            overflow: hidden;
+            background: #1e3a5f;
+        }
+
+        .leaflet-tile,
+        .leaflet-marker-icon,
+        .leaflet-marker-shadow {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .leaflet-tile::selection {
+            background: transparent;
+        }
+
+        .leaflet-zoom-animated {
+            -webkit-transform-origin: 0 0;
+            -ms-transform-origin: 0 0;
+            transform-origin: 0 0;
+        }
+
+        .leaflet-tile-container {
+            z-index: 1;
+        }
+
+        .leaflet-marker-pane {
+            z-index: 600;
+        }
+
+        .leaflet-popup-pane {
+            z-index: 700;
+        }
+
+        .leaflet-control {
+            position: relative;
+            z-index: 800;
+            pointer-events: visiblePainted;
+            pointer-events: auto;
+        }
+
+        .leaflet-top,
+        .leaflet-bottom {
+            position: absolute;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .leaflet-top {
+            top: 0;
+        }
+
+        .leaflet-right {
+            right: 0;
+        }
+
+        .leaflet-bottom {
+            bottom: 0;
+        }
+
+        .leaflet-left {
+            left: 0;
+        }
+
+        .leaflet-control-zoom {
+            margin-left: 10px;
+            margin-top: 10px;
+        }
+
+        .leaflet-control-zoom a {
+            background-color: #fff;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            color: black;
+            font: bold 18px 'Lucida Console', Monaco, monospace;
+        }
+
+        .leaflet-control-zoom a:hover {
+            background-color: #f4f4f4;
+        }
+
+        .leaflet-control-zoom-in {
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        .leaflet-control-zoom-out {
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            border-top: 1px solid #ccc;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background: white;
+            padding: 1px;
+            text-align: left;
+            border-radius: 12px;
+            color: #333;
+        }
+
+        .leaflet-popup-content {
+            margin: 13px 19px;
+            line-height: 1.4;
+        }
+
+        .leaflet-popup-tip-container {
+            width: 40px;
+            height: 20px;
+            position: absolute;
+            left: 50%;
+            margin-left: -20px;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .leaflet-popup-tip {
+            background: white;
+            width: 17px;
+            height: 17px;
+            padding: 1px;
+            margin: -10px auto 0;
+            -webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        .leaflet-popup-close-button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 4px 8px 0 0;
+            text-align: center;
+            text-decoration: none;
+            font: 16px/14px Tahoma, Verdana, sans-serif;
+            color: #c3c3c3;
+        }
+
+        .leaflet-popup-close-button:hover {
+            color: #999;
+        }
+
+        .leaflet-div-icon {
+            background: transparent;
+            border: none;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100">
+
+    <div class="main-container">
+        <!-- Telemetry Panel (Sidebar on Desktop, Top/Bottom on Mobile) -->
+        <div id="telemetry-panel" class="p-4 bg-gray-800 shadow-2xl relative" style="padding: 1.5rem;">
+            <h1 class="text-3xl font-bold mb-6 text-indigo-400 border-b border-indigo-700 pb-2">Ground Station</h1>
+
+            <!-- Connection Overlay (Displays until WebSocket connects) -->
+            <div id="connection-overlay" class="rounded-lg active">
+                <div class="flex flex-col items-center">
+                    <svg class="animate-spin icon-xl text-indigo-400 mb-3" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24" style="color: #818cf8;">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+                            style="opacity: 0.25;">
+                        </circle>
+                        <path style="opacity: 0.75;" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    <p class="text-lg font-medium" id="connection-status-text">Attempting to connect to bridge...</p>
+                    <p class="text-sm text-gray-400 mt-2">ws://localhost:8101</p>
+                </div>
+            </div>
+
+            <!-- Telemetry Data Cards -->
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Altitude Card -->
+                <div class="data-card p-3 rounded-lg flex flex-col items-center">
+                    <!-- Cloud Lightning Icon (inline SVG) -->
+                    <svg class="icon-lg mb-1" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 9" />
+                        <polyline points="13 11 9 17 15 17 11 23" />
+                    </svg>
+                    <p class="text-sm text-gray-400">ALTITUDE</p>
+                    <p id="data-alt" class="text-2xl font-extrabold text-blue-200">0 m</p>
+                </div>
+                <!-- Speed Card -->
+                <div class="data-card p-3 rounded-lg flex flex-col items-center">
+                    <!-- Gauge Icon -->
+                    <svg class="icon-lg mb-1" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 15V3" />
+                        <circle cx="12" cy="15" r="6" />
+                        <path d="M12 15L8 11" />
+                    </svg>
+                    <p class="text-sm text-gray-400">SPEED</p>
+                    <p id="data-speed" class="text-2xl font-extrabold text-teal-200">0 km/h</p>
+                </div>
+                <!-- Latitude Card -->
+                <div class="data-card p-3 rounded-lg col-span-2">
+                    <!-- Map Pin Icon -->
+                    <svg class="icon-md inline mr-2" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <span class="text-sm text-gray-400">LOCATION (Lat/Lon)</span>
+                    <p id="data-latlon" class="text-lg font-semibold text-yellow-200 truncate">7.8731 / 80.7718</p>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h2 class="text-xl font-semibold mb-3 text-red-400">Signal Status</h2>
+
+                <!-- RSSI Card -->
+                <div class="data-card p-3 rounded-lg mb-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="flex items-center">
+                            <!-- Signal Icon -->
+                            <svg class="icon-md mr-2" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 20h.01" />
+                                <path d="M7 20v-4" />
+                                <path d="M12 20v-8" />
+                                <path d="M17 20V8" />
+                            </svg>
+                            <span class="text-sm font-medium">RSSI (Signal Strength)</span>
+                        </div>
+                        <span id="data-rssi" class="text-lg font-bold text-red-200">-120 dBm</span>
+                    </div>
+                    <div class="signal-bar-container">
+                        <div id="rssi-bar" class="signal-bar" style="width: 0%; background-color: #dc2626;"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Status: <span id="rssi-status"
+                            class="text-red-400 font-semibold">No Signal</span></p>
+                </div>
+
+                <!-- SNR Card -->
+                <div class="data-card p-3 rounded-lg">
+                    <div class="flex justify-between items-center mb-1">
+                        <div class="flex items-center">
+                            <!-- Waves Icon -->
+                            <svg class="icon-md mr-2" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path
+                                    d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
+                                <path
+                                    d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
+                                <path
+                                    d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1" />
+                            </svg>
+                            <span class="text-sm font-medium">SNR (Signal-to-Noise)</span>
+                        </div>
+                        <span id="data-snr" class="text-lg font-bold text-green-200">0.0 dB</span>
+                    </div>
+                    <div class="signal-bar-container">
+                        <div id="snr-bar" class="signal-bar" style="width: 0%; background-color: #10b981;"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Quality: <span id="snr-status"
+                            class="text-green-400 font-semibold">Poor</span></p>
+                </div>
+            </div>
+
+            <!-- Camera Feed Section -->
+            <div class="mt-6">
+                <h2 class="text-xl font-semibold mb-3 text-purple-400 flex items-center justify-between">
+                    <span class="flex items-center">
+                        <!-- Video Icon -->
+                        <svg class="icon-md mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m22 8-6 4 6 4V8Z" />
+                            <rect width="14" height="12" x="2" y="6" rx="2" ry="2" />
+                        </svg>
+                        Live Camera Feed
+                    </span>
+                    <div class="flex items-center gap-2">
+                        <span id="camera-status"
+                            class="text-xs px-2 py-1 rounded-full bg-yellow-600 animate-pulse">Connecting...</span>
+                        <button id="fullscreen-btn" onclick="toggleFullscreen()"
+                            class="p-1 hover:bg-gray-700 rounded transition-colors" title="Toggle Fullscreen">
+                            <!-- Maximize Icon -->
+                            <svg class="icon-md text-gray-400 hover:text-white" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 3 21 3 21 9" />
+                                <polyline points="9 21 3 21 3 15" />
+                                <line x1="21" x2="14" y1="3" y2="10" />
+                                <line x1="3" x2="10" y1="21" y2="14" />
+                            </svg>
+                        </button>
+                    </div>
+                </h2>
+                <div class="data-card rounded-lg overflow-hidden relative" id="camera-container">
+                    <!-- Camera Stream -->
+                    <img id="camera-feed" src="http://10.42.0.1:8080//stream.mjpg" alt="Weather Balloon Camera Feed"
+                        class="w-full h-auto rounded-lg"
+                        style="min-height: 180px; background: #1a1a2e; object-fit: cover;" onload="cameraConnected()"
+                        onerror="cameraDisconnected()">
+
+                    <!-- Camera Offline Overlay -->
+                    <div id="camera-overlay"
+                        class="absolute inset-0 flex flex-col items-center justify-center rounded-lg hidden"
+                        style="background: rgba(17, 24, 39, 0.9);">
+                        <!-- Video Off Icon -->
+                        <svg class="icon-2xl mb-2" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.66 6H14a2 2 0 0 1 2 2v2.34l1 1L22 8v8" />
+                            <path d="M16 16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l10 10Z" />
+                            <line x1="2" x2="22" y1="2" y2="22" />
+                        </svg>
+                        <p class="text-sm text-gray-400">Camera Offline</p>
+                        <button onclick="reloadCamera()"
+                            class="mt-3 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 rounded text-xs transition-colors">
+                            Retry Connection
+                        </button>
+                    </div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">
+                    <!-- Wifi Icon -->
+                    <svg class="icon-sm inline mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
+                        <path d="M5 13a10 10 0 0 1 14 0" />
+                        <path d="M8.5 16.5a5 5 0 0 1 7 0" />
+                        <path d="M2 8.82a15 15 0 0 1 20 0" />
+                        <line x1="12" x2="12.01" y1="20" y2="20" />
+                    </svg>
+                    Stream: 10.42.0.1:8080
+                </p>
+            </div>
+
+            <!-- Last Update Footer -->
+            <div class="mt-6 pt-4 border-t border-gray-700">
+                <p class="text-xs text-gray-500">Last Packet Received:</p>
+                <p id="last-update" class="text-sm font-medium text-gray-400">Awaiting data...</p>
+
+                <!-- Debug Log Area -->
+                <div class="mt-4 p-2 bg-black rounded text-xs font-mono text-green-400 overflow-y-auto" id="debug-log"
+                    style="height: 6rem;">
+                    <div>> Debug Log Started</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Area -->
+        <div id="map-container" class="relative flex-grow">
+            <!-- Network Status Badge -->
+            <div id="network-badge" class="offline-badge hidden">
+                <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="2" x2="22" y1="2" y2="22" />
+                    <path d="M8.5 16.5a5 5 0 0 1 7 0" />
+                    <path d="M2 8.82a15 15 0 0 1 4.17-2.65" />
+                    <path d="M10.66 5c4.01.23 7.8 1.68 10.86 4.14" />
+                    <path d="M16.85 11.25a10 10 0 0 1 2.22 1.68" />
+                    <path d="M5 13a10 10 0 0 1 5.24-2.76" />
+                    <line x1="12" x2="12.01" y1="20" y2="20" />
+                </svg>
+                <span>Offline Mode</span>
+            </div>
+            <div id="map" class="w-full h-full"></div>
+
+            <!-- Offline Map Fallback -->
+            <div id="offline-map" class="w-full h-full offline-map hidden">
+                <div class="grid-overlay"></div>
+                <div id="balloon-indicator" class="balloon-indicator">
+                    <div class="ping"></div>
+                    <svg width="50" height="50" viewBox="0 0 24 24" fill="#ef4444" stroke="#ffffff" stroke-width="1.5">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" />
+                        <circle cx="12" cy="12" r="4" fill="#f59e0b" />
+                    </svg>
+                    <div class="coord-display">
+                        <div id="offline-coords">7.8731°N, 80.7718°E</div>
+                        <div id="offline-alt" class="text-xs text-gray-400 mt-1">Alt: 0m</div>
+                    </div>
+                </div>
+                <div
+                    style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); text-align: center; z-index: 10;">
+                    <p class="text-gray-400 text-sm">Map tiles unavailable offline</p>
+                    <p class="text-gray-500 text-xs mt-1">Telemetry data is still being tracked</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript for Map and WebSocket (all inline for offline support) -->
+    <script>
+        // Global variables for Map and Marker
+        let map = null;
+        let balloonMarker = null;
+        let socket;
+        let cameraRetryCount = 0;
+        let isOnline = navigator.onLine;
+        let leafletLoaded = false;
+        let leafletLoadAttempted = false;
+        const MAX_CAMERA_RETRIES = 5;
+        const CAMERA_STREAM_URL = "http://10.42.0.1:8080//stream.mjpg";
+        const INITIAL_LOCATION = [7.8731, 80.7718];
+
+        // Current balloon data
+        let currentData = {
+            lat: INITIAL_LOCATION[0],
+            lon: INITIAL_LOCATION[1],
+            alt: 0,
+            speed: 0,
+            rssi: -120,
+            snr: 0
+        };
+
+        function logDebug(msg) {
+            const logPanel = document.getElementById('debug-log');
+            if (logPanel) {
+                const entry = document.createElement('div');
+                entry.textContent = `> ${msg}`;
+                logPanel.appendChild(entry);
+                logPanel.scrollTop = logPanel.scrollHeight;
+                // Keep only last 50 entries
+                while (logPanel.children.length > 50) {
+                    logPanel.removeChild(logPanel.firstChild);
+                }
+            }
+        }
+
+        // --- NETWORK STATUS MONITORING ---
+
+        function updateNetworkStatus() {
+            isOnline = navigator.onLine;
+            const badge = document.getElementById('network-badge');
+
+            if (isOnline) {
+                badge.classList.add('hidden');
+                badge.classList.remove('offline-badge');
+                badge.classList.add('online-badge');
+                logDebug('Network: Online');
+
+                // Try to load Leaflet if not loaded yet
+                if (!leafletLoaded && !leafletLoadAttempted) {
+                    loadLeaflet();
+                }
+            } else {
+                badge.classList.remove('hidden');
+                badge.classList.add('offline-badge');
+                badge.classList.remove('online-badge');
+                badge.querySelector('span').textContent = 'Offline Mode';
+                logDebug('Network: Offline - Using fallback map');
+                showOfflineMap();
+            }
+        }
+
+        window.addEventListener('online', () => {
+            updateNetworkStatus();
+            // Attempt to reload map tiles
+            if (map && leafletLoaded) {
+                map.invalidateSize();
+                hideOfflineMap();
+            }
+        });
+
+        window.addEventListener('offline', () => {
+            updateNetworkStatus();
+        });
+
+        // --- LEAFLET DYNAMIC LOADING ---
+
+        function loadLeaflet() {
+            leafletLoadAttempted = true;
+
+            return new Promise((resolve, reject) => {
+                // Check if already loaded
+                if (typeof L !== 'undefined') {
+                    leafletLoaded = true;
+                    resolve();
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                script.async = true;
+
+                script.onload = () => {
+                    leafletLoaded = true;
+                    logDebug('Leaflet library loaded');
+                    resolve();
+                };
+
+                script.onerror = () => {
+                    logDebug('Failed to load Leaflet - using offline map');
+                    showOfflineMap();
+                    reject(new Error('Failed to load Leaflet'));
+                };
+
+                // Set timeout for loading
+                setTimeout(() => {
+                    if (!leafletLoaded) {
+                        logDebug('Leaflet load timeout - using offline map');
+                        showOfflineMap();
+                        reject(new Error('Leaflet load timeout'));
+                    }
+                }, 5000);
+
+                document.head.appendChild(script);
+            });
+        }
+
+        // --- OFFLINE MAP FALLBACK ---
+
+        function showOfflineMap() {
+            const mapDiv = document.getElementById('map');
+            const offlineMap = document.getElementById('offline-map');
+
+            if (mapDiv) mapDiv.classList.add('hidden');
+            if (offlineMap) offlineMap.classList.remove('hidden');
+
+            updateOfflineMapPosition();
+        }
+
+        function hideOfflineMap() {
+            const mapDiv = document.getElementById('map');
+            const offlineMap = document.getElementById('offline-map');
+
+            if (mapDiv) mapDiv.classList.remove('hidden');
+            if (offlineMap) offlineMap.classList.add('hidden');
+        }
+
+        function updateOfflineMapPosition() {
+            const coordsEl = document.getElementById('offline-coords');
+            const altEl = document.getElementById('offline-alt');
+
+            if (coordsEl) {
+                const latDir = currentData.lat >= 0 ? 'N' : 'S';
+                const lonDir = currentData.lon >= 0 ? 'E' : 'W';
+                coordsEl.textContent = `${Math.abs(currentData.lat).toFixed(4)}°${latDir}, ${Math.abs(currentData.lon).toFixed(4)}°${lonDir}`;
+            }
+
+            if (altEl) {
+                altEl.textContent = `Alt: ${Math.round(currentData.alt).toLocaleString()}m | Speed: ${currentData.speed.toFixed(1)} km/h`;
+            }
+        }
+
+        // --- CAMERA STREAM FUNCTIONS ---
+
+        function cameraConnected() {
+            const statusBadge = document.getElementById('camera-status');
+            const overlay = document.getElementById('camera-overlay');
+
+            statusBadge.textContent = 'Live';
+            statusBadge.className = 'text-xs px-2 py-1 rounded-full bg-green-600';
+            overlay.classList.add('hidden');
+            cameraRetryCount = 0;
+            logDebug('Camera stream connected');
+        }
+
+        function cameraDisconnected() {
+            const statusBadge = document.getElementById('camera-status');
+            const overlay = document.getElementById('camera-overlay');
+
+            statusBadge.textContent = 'Offline';
+            statusBadge.className = 'text-xs px-2 py-1 rounded-full bg-red-600';
+            overlay.classList.remove('hidden');
+            logDebug('Camera stream disconnected');
+
+            // Auto-retry with exponential backoff (up to 5 retries)
+            if (cameraRetryCount < MAX_CAMERA_RETRIES) {
+                const retryDelay = Math.pow(2, cameraRetryCount) * 1000;
+                cameraRetryCount++;
+                logDebug(`Camera retry ${cameraRetryCount}/${MAX_CAMERA_RETRIES} in ${retryDelay / 1000}s`);
+                setTimeout(reloadCamera, retryDelay);
+            }
+        }
+
+        function reloadCamera() {
+            const cameraFeed = document.getElementById('camera-feed');
+            const statusBadge = document.getElementById('camera-status');
+
+            statusBadge.textContent = 'Connecting...';
+            statusBadge.className = 'text-xs px-2 py-1 rounded-full bg-yellow-600 animate-pulse';
+
+            // Force reload by adding timestamp to URL
+            cameraFeed.src = CAMERA_STREAM_URL + "?t=" + Date.now();
+            logDebug('Attempting camera reconnection...');
+        }
+
+        function toggleFullscreen() {
+            const container = document.getElementById('camera-container');
+
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().then(() => {
+                    logDebug('Camera fullscreen enabled');
+                }).catch(err => {
+                    logDebug('Fullscreen error: ' + err.message);
+                });
+            } else {
+                document.exitFullscreen();
+                logDebug('Camera fullscreen disabled');
+            }
+        }
+
+        // --- MAP INITIALIZATION ---
+
+        async function initMap() {
+            updateNetworkStatus();
+
+            // Try to load Leaflet
+            if (isOnline) {
+                try {
+                    await loadLeaflet();
+                    initLeafletMap();
+                } catch (e) {
+                    showOfflineMap();
+                }
+            } else {
+                showOfflineMap();
+            }
+
+            // Start the WebSocket connection (works regardless of map status)
+            connectWebSocket();
+        }
+
+        function initLeafletMap() {
+            if (!leafletLoaded || typeof L === 'undefined') {
+                logDebug('Leaflet not available');
+                showOfflineMap();
+                return;
+            }
+
+            try {
+                // Hide offline map
+                hideOfflineMap();
+
+                // Initialize Leaflet Map
+                map = L.map('map').setView(INITIAL_LOCATION, 10);
+
+                // Add OpenStreetMap Tile Layer with error handling
+                const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    errorTileUrl: '' // Empty string to suppress errors
+                });
+
+                tileLayer.on('tileerror', function (e) {
+                    logDebug('Map tile error - network issue detected');
+                });
+
+                tileLayer.addTo(map);
+
+                // Custom SVG Icon
+                const svgIcon = L.divIcon({
+                    html: `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#ef4444" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-3.31 0-6-2.69-6-6h2c0 2.21 1.79 4 4 4s4-1.79 4-4h2c0 3.31-2.69 6-6 6z"/><path d="M12 8c-2.21 0-4 1.79-4 4h8c0-2.21-1.79-4-4-4z" fill="#f59e0b"/></svg>`,
+                    className: '',
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20],
+                });
+
+                // Add Marker
+                balloonMarker = L.marker(INITIAL_LOCATION, { icon: svgIcon }).addTo(map);
+                balloonMarker.bindPopup("<b>Tracking Payload</b><br>Waiting for data...").openPopup();
+
+                logDebug('Leaflet map initialized');
+            } catch (e) {
+                logDebug('Error initializing Leaflet: ' + e.message);
+                showOfflineMap();
+            }
+        }
+
+        // --- WEBSOCKET CONNECTION ---
+
+        function connectWebSocket() {
+            const statusText = document.getElementById('connection-status-text');
+            const overlay = document.getElementById('connection-overlay');
+
+            try {
+                // Connect to the Python bridge server
+                socket = new WebSocket('ws://localhost:8101');
+                statusText.textContent = "Attempting to connect to bridge...";
+
+                socket.onopen = () => {
+                    console.log('WebSocket Connected.');
+                    statusText.textContent = "CONNECTED";
+                    logDebug('WebSocket connected to bridge');
+
+                    // Hide the overlay
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.style.opacity = '0', 500);
+                    setTimeout(() => overlay.style.display = 'none', 1000);
+                };
+
+                socket.onmessage = async (event) => {
+                    let msgText = event.data;
+
+                    // Handle Blob data
+                    if (event.data instanceof Blob) {
+                        msgText = await event.data.text();
+                    }
+
+                    logDebug("Rx: " + msgText);
+
+                    try {
+                        const data = JSON.parse(msgText);
+                        updateUI(data);
+                    } catch (e) {
+                        console.error("Error parsing JSON data:", e, msgText);
+                        logDebug("JSON Error: " + e.message);
+                    }
+                };
+
+                socket.onclose = (event) => {
+                    console.warn('WebSocket Disconnected.', event);
+                    overlay.style.display = 'flex';
+                    overlay.style.opacity = '1';
+                    overlay.classList.add('active');
+                    statusText.textContent = `DISCONNECTED. Code: ${event.code}`;
+                    logDebug('WebSocket disconnected - retrying in 5s');
+                    // Attempt to reconnect after 5 seconds
+                    setTimeout(connectWebSocket, 5000);
+                };
+
+                socket.onerror = (error) => {
+                    console.error('WebSocket Error:', error);
+                    statusText.textContent = "ERROR. Retrying...";
+                    logDebug('WebSocket error');
+                };
+
+            } catch (e) {
+                console.error("Failed to initialize WebSocket:", e);
+                statusText.textContent = "FATAL ERROR. Check Console.";
+                logDebug('WebSocket fatal error: ' + e.message);
+            }
+        }
+
+        // --- UI UPDATE LOGIC ---
+
+        function updateUI(data) {
+            // Data is an array: [lat, lon, alt, speed, rssi, snr]
+            const rawLat = data[0];
+            const rawLon = data[1];
+            const rawAlt = data[2];
+            const rawSpeed = data[3];
+            const rawRssi = data[4];
+            const rawSnr = data[5];
+
+            // Update current data store
+            currentData = {
+                lat: parseFloat(rawLat),
+                lon: parseFloat(rawLon),
+                alt: parseFloat(rawAlt),
+                speed: parseFloat(rawSpeed),
+                rssi: parseFloat(rawRssi),
+                snr: parseFloat(rawSnr)
+            };
+
+            const newPosition = [currentData.lat, currentData.lon];
+
+            // 1. Update Map Marker (Leaflet) if available
+            if (leafletLoaded && balloonMarker && map) {
+                try {
+                    balloonMarker.setLatLng(newPosition);
+                    map.panTo(newPosition);
+                    balloonMarker.setPopupContent(`
+                        <b>Payload Active</b><br>
+                        Alt: ${Math.round(currentData.alt)}m<br>
+                        Speed: ${currentData.speed.toFixed(1)} km/h
+                     `);
+                } catch (e) {
+                    // Map might be unavailable, use offline map
+                }
+            }
+
+            // 2. Update Offline Map if visible
+            updateOfflineMapPosition();
+
+            // 3. Update Telemetry Panel
+            document.getElementById('data-latlon').textContent = `${currentData.lat.toFixed(6)} / ${currentData.lon.toFixed(6)}`;
+            document.getElementById('data-alt').textContent = `${Math.round(currentData.alt).toLocaleString()} m`;
+            document.getElementById('data-speed').textContent = `${currentData.speed.toFixed(1)} km/h`;
+            document.getElementById('data-rssi').textContent = `${currentData.rssi} dBm`;
+            document.getElementById('data-snr').textContent = `${currentData.snr.toFixed(1)} dB`;
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+
+            // 4. Update Signal Status and Bars
+            updateSignalIndicators(currentData.rssi, currentData.snr);
+        }
+
+        function updateSignalIndicators(rssi, snr) {
+            // RSSI (Signal Strength) Logic
+            const minRssi = -140;
+            const maxRssi = -40;
+            let rssiPercent = Math.min(100, Math.max(0, (rssi - minRssi) / (maxRssi - minRssi) * 100));
+
+            const rssiBar = document.getElementById('rssi-bar');
+            const rssiStatus = document.getElementById('rssi-status');
+            rssiBar.style.width = `${rssiPercent}%`;
+
+            let rssiColor = '#dc2626';
+            let statusText = 'No Signal';
+
+            if (rssiPercent >= 75) {
+                rssiColor = '#10b981';
+                statusText = 'Excellent';
+            } else if (rssiPercent >= 50) {
+                rssiColor = '#f59e0b';
+                statusText = 'Good';
+            } else if (rssiPercent >= 25) {
+                rssiColor = '#f97316';
+                statusText = 'Fair';
+            } else if (rssiPercent > 0) {
+                rssiColor = '#dc2626';
+                statusText = 'Poor';
+            }
+
+            rssiBar.style.backgroundColor = rssiColor;
+            rssiStatus.textContent = statusText;
+            rssiStatus.style.color = rssiColor;
+
+            // SNR (Signal-to-Noise Ratio) Logic
+            const minSnr = -10;
+            const maxSnr = 15;
+            let snrPercent = Math.min(100, Math.max(0, (snr - minSnr) / (maxSnr - minSnr) * 100));
+
+            const snrBar = document.getElementById('snr-bar');
+            const snrStatus = document.getElementById('snr-status');
+            snrBar.style.width = `${snrPercent}%`;
+
+            let snrColor = '#dc2626';
+            let snrStatusText = 'Very Poor';
+
+            if (snrPercent >= 80) {
+                snrColor = '#10b981';
+                snrStatusText = 'Excellent';
+            } else if (snrPercent >= 50) {
+                snrColor = '#f59e0b';
+                snrStatusText = 'Good';
+            } else if (snrPercent >= 20) {
+                snrColor = '#f97316';
+                snrStatusText = 'Fair';
+            }
+
+            snrBar.style.backgroundColor = snrColor;
+            snrStatus.textContent = snrStatusText;
+            snrStatus.style.color = snrColor;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            logDebug('Initializing ground station...');
+            initMap();
+        });
+
+    </script>
+</body>
+
+</html>
